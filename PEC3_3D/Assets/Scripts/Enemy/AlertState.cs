@@ -16,19 +16,24 @@ public class AlertState: IEnemyState
 
         if(currentRotationTime > enemyAI.rotationTime)
         {
+            enemyAI.animator.SetBool("Turn", false);
             currentRotationTime = 0;
             ToWanderState();
         }
         else
         {
+            enemyAI.animator.SetBool("Turn", true);
             RaycastHit hit;
 
+            Debug.DrawRay(new Vector3(enemyAI.transform.position.x, 1.8f, enemyAI.transform.position.z),
+                          enemyAI.transform.forward * 100, Color.red);
+
             if(Physics.Raycast(new Ray(
-                new Vector3(enemyAI.transform.position.x, 0.5f, enemyAI.transform.position.z),
+                new Vector3(enemyAI.transform.position.x, 1.8f, enemyAI.transform.position.z),
                 enemyAI.transform.forward * 100),
                 out hit))
             {
-                if (hit.collider.gameObject.CompareTag("Player"))
+                if (hit.collider.CompareTag("Player"))
                 {
                     ToAttackState();
                 }

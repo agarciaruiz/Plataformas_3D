@@ -12,12 +12,13 @@ public class EnemyAI : MonoBehaviour
     [HideInInspector] public IEnemyState currentState;
 
     [HideInInspector] public NavMeshAgent navMeshAgent;
+    [HideInInspector] public Animator animator;
     //[HideInInspector] public AudioSource fireAudio;
     [HideInInspector] public GameObject target;
 
     [HideInInspector] public EnemyStats enemyStats;
 
-    [HideInInspector] public float rotationTime = 3.0f;
+    [HideInInspector] public float rotationTime = 10.0f;
     [HideInInspector] public float shootHeight = 0.5f;
     [HideInInspector] public float walkSpeed = 0.1f;
     //public Transform[] wayPoints;
@@ -73,6 +74,7 @@ public class EnemyAI : MonoBehaviour
         attackState = new AttackState(this);
 
         navMeshAgent = GetComponent<NavMeshAgent>();
+        animator = GetComponent<Animator>();
         //fireAudio = GetComponent<AudioSource>();
         target = GameObject.FindGameObjectWithTag("Player");
         enemyStats = GetComponent<EnemyStats>();
