@@ -19,13 +19,6 @@ public class WanderState : IEnemyState
         {
             enemyAI.navMeshAgent.destination = randPos;
         }
-
-        /*enemyAI.navMeshAgent.destination = enemyAI.wayPoints[nextWayPoint].position;
-
-        if (!enemyAI.navMeshAgent.pathPending && enemyAI.navMeshAgent.remainingDistance < 0.5f)
-        {
-            nextWayPoint = (nextWayPoint + 1) % enemyAI.wayPoints.Length;
-        }*/
     }
 
     public void Impact()
@@ -44,7 +37,6 @@ public class WanderState : IEnemyState
     public void ToAttackState()
     {
         enemyAI.navMeshAgent.isStopped = true;
-        enemyAI.shouldFollow = true;
         enemyAI.currentState = enemyAI.attackState;
     }
 

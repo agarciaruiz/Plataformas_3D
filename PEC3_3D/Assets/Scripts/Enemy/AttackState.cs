@@ -6,7 +6,7 @@ public class AttackState : IEnemyState
 {
     EnemyAI enemyAI;
     private float lastAttackTime = 0;
-    private float stoppingDistance = 5;
+    private bool hasReachedPlayer = false;
 
     public AttackState(EnemyAI enemy)
     {
@@ -15,17 +15,40 @@ public class AttackState : IEnemyState
 
     public void UpdateState()
     {
-        float distToTarget = Vector3.Distance(enemyAI.transform.position, enemyAI.target.transform.position);
         Vector3 lookDir = enemyAI.target.transform.position - enemyAI.transform.position;
-
-        FollowTarget(distToTarget);
         LookAtTarget(lookDir);
+        enemyAI.animator.SetBool("Idle", false);
+        FollowTarget();
+
+        if (enemyAI.navMeshAgent.remainingDistance <= enemyAI.navMeshAgent.stoppingDistance)
+        {
+            enemyAI.animator.SetBool("Idle", true);
+            if (!hasReachedPlayer)
+            {
+                hasReachedPlayer = true;
+                lastAttackTime = Time.time;
+            }
+
+            if (Time.time >= lastAttackTime + enemyAI.GetComponent<EnemyStats>().attackSpeed)
+            {
+                lastAttackTime = Time.time;
+                AttackAnim();
+            }
+        }
+        else
+        {
+            if (hasReachedPlayer)
+            {
+                hasReachedPlayer = false;
+            }
+        }
     }
 
     public void Impact() {}
 
     public void ToAlertState()
     {
+        enemyAI.navMeshAgent.isStopped = true;
         enemyAI.currentState = enemyAI.alertState;
     }
 
@@ -34,39 +57,32 @@ public class AttackState : IEnemyState
 
     public void OnTriggerEnter(Collider col){}
 
-    public void OnTriggerStay(Collider col)
-    {
-        if (col.GetComponent<CharacterStats>() != null && !col.GetComponent<CharacterStats>().isDead)
-        {
-            if (Time.time >= lastAttackTime + enemyAI.enemyStats.attackSpeed)
-            {
-                lastAttackTime = Time.time;
-                Attack(col.GetComponent<CharacterStats>());
-            }
-        }
-    }
+    public void OnTriggerStay(Collider col){}
 
     public void OnTriggerExit(Collider col)
     {
-        enemyAI.shouldFollow = false;
         ToAlertState();
     }
 
-    private void Attack(CharacterStats statsToDamage)
+    private void AttackAnim()
     {
-        if (!statsToDamage.isDead)
+        enemyAI.animator.SetTrigger("Attack");
+        //enemyAI.fireAudio.Play();
+    }
+
+    public void DamageTarget()
+    {
+        if (!enemyAI.target.GetComponent<PlayerStats>().isDead)
         {
-            //enemyAI.fireAudio.Play();
-            enemyAI.enemyStats.DealDamage(statsToDamage);
+            enemyAI.enemyStats.DealDamage(enemyAI.target.GetComponent<PlayerStats>());
         }
     }
 
-    private void FollowTarget(float distance)
+    public void FollowTarget()
     {
-        if (enemyAI.shouldFollow && distance >= stoppingDistance)
-        {
-            enemyAI.transform.position = Vector3.MoveTowards(enemyAI.transform.position, enemyAI.target.transform.position, enemyAI.walkSpeed * Time.deltaTime);
-        }
+        enemyAI.navMeshAgent.isStopped = false;
+        enemyAI.navMeshAgent.speed = 1.5f;
+        enemyAI.navMeshAgent.SetDestination(enemyAI.target.transform.position);
     }
 
     private void LookAtTarget(Vector3 lookDir)

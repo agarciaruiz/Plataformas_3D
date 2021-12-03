@@ -20,10 +20,8 @@ public class EnemyAI : MonoBehaviour
 
     [HideInInspector] public float rotationTime = 10.0f;
     [HideInInspector] public float shootHeight = 0.5f;
-    [HideInInspector] public float walkSpeed = 0.1f;
     //public Transform[] wayPoints;
     [HideInInspector] public bool isHit;
-    [HideInInspector] public bool shouldFollow;
 
 
     void Start()
@@ -59,11 +57,19 @@ public class EnemyAI : MonoBehaviour
         currentState.OnTriggerExit(other);
     }
 
+    public void FollowTarget()
+    {
+        attackState.FollowTarget();
+    }
+
+    public void DamageTarget()
+    {
+        attackState.DamageTarget();
+    }
+
     private void InitVariables()
     {
         isHit = false;
-        shouldFollow = false;
-        navMeshAgent.speed = walkSpeed;
         currentState = wanderState;
     }
 

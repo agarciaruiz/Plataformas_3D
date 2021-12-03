@@ -1,4 +1,6 @@
-﻿using UnityEngine;
+﻿using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
 
 public class AlertState: IEnemyState
 {
@@ -35,6 +37,8 @@ public class AlertState: IEnemyState
             {
                 if (hit.collider.CompareTag("Player"))
                 {
+                    enemyAI.animator.SetBool("Turn", false);
+                    enemyAI.animator.SetTrigger("Scream");
                     ToAttackState();
                 }
             }
@@ -46,7 +50,7 @@ public class AlertState: IEnemyState
     public void ToAlertState() {}
     public void ToAttackState()
     {
-        enemyAI.shouldFollow = true;
+        Debug.Log("Attack State");
         enemyAI.currentState = enemyAI.attackState;
     }
 

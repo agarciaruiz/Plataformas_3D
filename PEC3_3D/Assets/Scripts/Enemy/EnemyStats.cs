@@ -8,7 +8,7 @@ public class EnemyStats : CharacterStats
     [SerializeField] private int damage;
     //private LootableObj lootableObj;
     //private EnemyUI enemyUI;
-    public float attackSpeed;
+    public float attackSpeed = 1f;
 
     private void Start()
     {
