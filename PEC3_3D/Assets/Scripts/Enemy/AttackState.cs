@@ -18,7 +18,14 @@ public class AttackState : IEnemyState
         Vector3 lookDir = enemyAI.target.transform.position - enemyAI.transform.position;
         LookAtTarget(lookDir);
         enemyAI.animator.SetBool("Idle", false);
-        FollowTarget();
+        if (!enemyAI.GetComponent<EnemyStats>().isDead)
+        {
+            FollowTarget();
+        }
+        else
+        {
+            enemyAI.navMeshAgent.isStopped = true;
+        }
 
         if (enemyAI.navMeshAgent.remainingDistance <= enemyAI.navMeshAgent.stoppingDistance)
         {
@@ -67,7 +74,6 @@ public class AttackState : IEnemyState
     private void AttackAnim()
     {
         enemyAI.animator.SetTrigger("Attack");
-        //enemyAI.fireAudio.Play();
     }
 
     public void DamageTarget()
@@ -84,7 +90,7 @@ public class AttackState : IEnemyState
         enemyAI.navMeshAgent.speed = 1.5f;
         enemyAI.navMeshAgent.SetDestination(enemyAI.target.transform.position);
     }
-
+    
     private void LookAtTarget(Vector3 lookDir)
     {
         enemyAI.transform.rotation = Quaternion.FromToRotation(Vector3.forward, new Vector3(lookDir.x, 0, lookDir.z));

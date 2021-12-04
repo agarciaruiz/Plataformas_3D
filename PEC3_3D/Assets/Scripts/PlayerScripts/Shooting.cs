@@ -1,5 +1,4 @@
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.Animations.Rigging;
@@ -11,6 +10,7 @@ public class Shooting : MonoBehaviour
     [SerializeField] private Transform target;
     [SerializeField] private ParticleSystem muzzleFlash;
     [SerializeField] private ParticleSystem hitEffect;
+    [SerializeField] private GameObject bloodParticles;
 
     private Inventory inventory;
     private EquipmentManager equipmentManager;
@@ -25,7 +25,6 @@ public class Shooting : MonoBehaviour
     private float lastFireTime;
     private bool canShoot;
     private bool canReload;
-    private bool isAiming;
 
     [HideInInspector] public int primaryCurrentAmmo;
     [HideInInspector] public int primaryCurrentAmmoStorage;
@@ -82,17 +81,19 @@ public class Shooting : MonoBehaviour
             Debug.Log(hit.transform.name);
             if (hit.collider.gameObject.tag == "Enemy")
             {
-                /*CharacterStats enemyStats = hit.collider.gameObject.GetComponentInParent<CharacterStats>();
+                EnemyStats enemyStats = hit.collider.gameObject.GetComponentInParent<EnemyStats>();
                 EnemyAI enemyAI = hit.collider.gameObject.GetComponentInParent<EnemyAI>();
                 enemyAI.isHit = true;
-                DealDamage(enemyStats, currentWeapon.damage);*/
+                StartCoroutine(EnemyHitAnim(hit.collider.gameObject.GetComponentInParent<Animator>()));
+                //EmitParticles(bloodParticles, hit);
+                GameObject particleInstance = (GameObject)Instantiate(bloodParticles, hit.point, Quaternion.identity);
+                Destroy(particleInstance, 0.5f);
+                DealDamage(enemyStats, currentWeapon.damage);
             }
 
             if (hit.collider.gameObject.tag != "Enemy")
             {
-                hitEffect.transform.position = hit.point;
-                hitEffect.transform.forward = hit.normal;
-                hitEffect.Emit(1);
+                EmitParticles(hitEffect, hit);
             }
         }
         muzzleFlash.Emit(1);
@@ -227,20 +228,25 @@ public class Shooting : MonoBehaviour
 
     private void StartAim()
     {
-        isAiming = true;
         aimLayer.weight += Time.deltaTime / aimDuration;
     }
 
     private void CancelAim()
     {
-        isAiming = false;
         aimLayer.weight -= Time.deltaTime / aimDuration;
     }
 
-    /*public void DealDamage(CharacterStats statsToDamage, int damage)
+    private void EmitParticles(ParticleSystem particles, RaycastHit hit)
+    {
+        particles.transform.position = hit.point;
+        particles.transform.forward = hit.normal;
+        particles.Emit(1);
+    }
+
+    public void DealDamage(CharacterStats statsToDamage, int damage)
     {
         statsToDamage.TakeDamage(damage);
-    }*/
+    }
 
     IEnumerator ShootAnim()
     {
@@ -248,6 +254,14 @@ public class Shooting : MonoBehaviour
         animator.SetTrigger("Shoot");
         yield return new WaitForSeconds(0.9f);
         animator.SetLayerWeight(animator.GetLayerIndex("Shoot Layer"), 0);
+    }
+
+    IEnumerator EnemyHitAnim(Animator anim)
+    {
+        anim.SetLayerWeight(anim.GetLayerIndex("HitLayer"), 1);
+        anim.SetTrigger("Hit");
+        yield return new WaitForSeconds(0.9f);
+        anim.SetLayerWeight(anim.GetLayerIndex("HitLayer"), 0);
     }
 
     private void CheckCanShoot(int slot)
@@ -304,6 +318,5 @@ public class Shooting : MonoBehaviour
         reloadAction = playerInput.actions["Reload"];
         canShoot = true;
         canReload = true;
-        isAiming = false;
     }
 }

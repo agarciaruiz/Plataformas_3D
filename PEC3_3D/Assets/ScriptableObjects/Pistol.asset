@@ -19,7 +19,7 @@ MonoBehaviour:
   hitParticles: {fileID: 961035278023441959, guid: 0cdab7b8429cf4f43b5c64a3b05076a4, type: 3}
   magazineSize: 12
   storedAmmo: 72
-  damage: 5
+  damage: 35
   fireRate: 1
   range: 75
   weaponType: 0

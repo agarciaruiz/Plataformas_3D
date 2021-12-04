@@ -27,9 +27,6 @@ public class AlertState: IEnemyState
             enemyAI.animator.SetBool("Turn", true);
             RaycastHit hit;
 
-            Debug.DrawRay(new Vector3(enemyAI.transform.position.x, 1.8f, enemyAI.transform.position.z),
-                          enemyAI.transform.forward * 100, Color.red);
-
             if(Physics.Raycast(new Ray(
                 new Vector3(enemyAI.transform.position.x, 1.8f, enemyAI.transform.position.z),
                 enemyAI.transform.forward * 100),
@@ -62,6 +59,8 @@ public class AlertState: IEnemyState
 
     public void Impact()
     {
+        enemyAI.animator.SetBool("Turn", false);
+        enemyAI.animator.SetTrigger("Scream");
         ToAttackState();
     }
 

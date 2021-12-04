@@ -3,7 +3,6 @@ using UnityEngine;
 public class WanderState : IEnemyState
 {
     EnemyAI enemyAI;
-    private int nextWayPoint = 0;
     private float wanderRadius = 100;
 
     public WanderState(EnemyAI enemy)
@@ -32,7 +31,6 @@ public class WanderState : IEnemyState
         enemyAI.navMeshAgent.isStopped = true;    
         enemyAI.currentState = enemyAI.alertState;
     }
-
 
     public void ToAttackState()
     {

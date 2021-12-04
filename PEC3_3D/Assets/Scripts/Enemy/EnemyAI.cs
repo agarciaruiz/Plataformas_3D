@@ -13,15 +13,14 @@ public class EnemyAI : MonoBehaviour
 
     [HideInInspector] public NavMeshAgent navMeshAgent;
     [HideInInspector] public Animator animator;
-    //[HideInInspector] public AudioSource fireAudio;
     [HideInInspector] public GameObject target;
 
     [HideInInspector] public EnemyStats enemyStats;
 
     [HideInInspector] public float rotationTime = 10.0f;
     [HideInInspector] public float shootHeight = 0.5f;
-    //public Transform[] wayPoints;
     [HideInInspector] public bool isHit;
+    [HideInInspector] public bool scream = false;
 
 
     void Start()
@@ -33,12 +32,17 @@ public class EnemyAI : MonoBehaviour
     void Update()
     {
         currentState.UpdateState();
-        enemyStats.CheckHealth();
 
         if (isHit)
         {
             currentState.Impact();
             isHit = false;
+        }
+
+        if (scream)
+        {
+            StartCoroutine(ScreamAnimation());
+            scream = false;
         }
     }
 
@@ -67,6 +71,13 @@ public class EnemyAI : MonoBehaviour
         attackState.DamageTarget();
     }
 
+    public IEnumerator ScreamAnimation()
+    {
+        animator.SetTrigger("Scream");
+        yield return new WaitForSeconds(2.5f);
+        currentState.ToAttackState();
+    }
+
     private void InitVariables()
     {
         isHit = false;
@@ -81,7 +92,6 @@ public class EnemyAI : MonoBehaviour
 
         navMeshAgent = GetComponent<NavMeshAgent>();
         animator = GetComponent<Animator>();
-        //fireAudio = GetComponent<AudioSource>();
         target = GameObject.FindGameObjectWithTag("Player");
         enemyStats = GetComponent<EnemyStats>();
     }

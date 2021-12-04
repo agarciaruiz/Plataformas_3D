@@ -1,14 +1,14 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.AI;
 
 public class EnemyStats : CharacterStats
 {
-    //[SerializeField] GameObject explosionParticles;
     [SerializeField] private int damage;
-    //private LootableObj lootableObj;
+    private LootableObj lootableObj;
     //private EnemyUI enemyUI;
-    public float attackSpeed = 1f;
+    public float attackSpeed = 2f;
 
     private void Start()
     {
@@ -33,12 +33,9 @@ public class EnemyStats : CharacterStats
     public override void Die()
     {
         base.Die();
+        GetComponent<Animator>().SetTrigger("Die");
         //GameManager.enemiesLeft--;
         //Debug.Log(GameManager.enemiesLeft);
-        //lootableObj.DropLoot();
-        //GameObject explosion = Instantiate(explosionParticles, transform.position, transform.rotation);
-        //PlayDieSound(explosion);
-        Destroy(this.gameObject);
     }
 
     /*private void PlayDieSound(GameObject gameObject)
@@ -46,6 +43,12 @@ public class EnemyStats : CharacterStats
         AudioSource audioSource = gameObject.GetComponent<AudioSource>();
         audioSource.Play();
     }*/
+
+    public void DestroyEnemy()
+    {
+        lootableObj.DropLoot();
+        Destroy(this.gameObject);
+    }
 
     public override void InitVariables()
     {
@@ -56,6 +59,6 @@ public class EnemyStats : CharacterStats
     private void GetReferences()
     {
         //enemyUI = GetComponent<EnemyUI>();
-        //lootableObj = GetComponent<LootableObj>();
+        lootableObj = GetComponent<LootableObj>();
     }
 }
