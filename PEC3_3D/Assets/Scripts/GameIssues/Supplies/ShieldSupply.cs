@@ -6,6 +6,8 @@ public class ShieldSupply : MonoBehaviour, ISupply
 {
     private GameObject player;
     private CharacterStats characterStats;
+    private PlayerController playerController;
+    private AudioSource audioSource;
     private int shieldToAdd = 30;
 
     private void Start()
@@ -21,6 +23,8 @@ public class ShieldSupply : MonoBehaviour, ISupply
         }
         else
         {
+            audioSource.clip = playerController.pickupClip;
+            audioSource.Play();
             characterStats.AddShield(shieldToAdd);
             Destroy(this.gameObject);
         }
@@ -28,12 +32,17 @@ public class ShieldSupply : MonoBehaviour, ISupply
 
     private void OnTriggerEnter(Collider other)
     {
-        PickupSupply();
+        if (other.gameObject.CompareTag("Player"))
+        {
+            PickupSupply();
+        }
     }
 
     private void GetReferences()
     {
         player = GameObject.FindGameObjectWithTag("Player");
         characterStats = player.GetComponent<CharacterStats>();
+        playerController = player.GetComponent<PlayerController>();
+        audioSource = player.GetComponent<AudioSource>();
     }
 }

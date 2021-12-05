@@ -14,6 +14,7 @@ public class SwitchVCam : MonoBehaviour
     private void Awake()
     {
         vCam = GetComponent<CinemachineVirtualCamera>();
+        aimCanvas.enabled = false;
     }
 
     private void Update()

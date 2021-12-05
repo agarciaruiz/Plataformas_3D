@@ -3,6 +3,8 @@ using UnityEngine;
 public class MedSupply : MonoBehaviour ,ISupply
 {
     private GameObject player;
+    private PlayerController playerController;
+    private AudioSource audioSource;
     private CharacterStats characterStats;
     private int healthToAdd = 30;
 
@@ -19,6 +21,8 @@ public class MedSupply : MonoBehaviour ,ISupply
         }
         else
         {
+            audioSource.clip = playerController.pickupClip;
+            audioSource.Play();
             characterStats.Heal(healthToAdd);
             Destroy(this.gameObject);
         }
@@ -26,12 +30,17 @@ public class MedSupply : MonoBehaviour ,ISupply
 
     private void OnTriggerEnter(Collider other)
     {
-        PickupSupply();
+        if (other.gameObject.CompareTag("Player"))
+        {
+            PickupSupply();
+        }
     }
 
     private void GetReferences()
     {
         player = GameObject.FindGameObjectWithTag("Player");
         characterStats = player.GetComponent<CharacterStats>();
+        playerController = player.GetComponent<PlayerController>();
+        audioSource = player.GetComponent<AudioSource>();
     }
 }

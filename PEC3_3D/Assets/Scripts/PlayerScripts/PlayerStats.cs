@@ -29,8 +29,8 @@ public class PlayerStats : CharacterStats
     {
         base.Die();
         animator.SetTrigger("IsDead");
-//        GameManager gameManager = GameObject.FindObjectOfType<GameManager>();
-//        gameManager.Respawn();
+        GameManager gameManager = GameObject.FindObjectOfType<GameManager>();
+        gameManager.EndGame();
     }
 
     public override void CheckHealth()

@@ -5,6 +5,8 @@ using UnityEngine.Animations.Rigging;
 [RequireComponent(typeof(CharacterController), typeof(PlayerInput))]
 public class PlayerController : MonoBehaviour
 {
+    public AudioClip pickupClip;
+
     [SerializeField] private float playerSpeed = 5.0f;
     [SerializeField] private float jumpHeight = 1.5f;
     [SerializeField] private float gravityValue = -9.81f;

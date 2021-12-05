@@ -5,7 +5,7 @@ using UnityEngine.AI;
 
 public class EnemyAI : MonoBehaviour
 {
-
+    [SerializeField] private ParticleSystem bloodParticles;
     [HideInInspector] public WanderState wanderState;
     [HideInInspector] public AlertState alertState ;
     [HideInInspector] public AttackState attackState ;
@@ -31,18 +31,21 @@ public class EnemyAI : MonoBehaviour
 
     void Update()
     {
-        currentState.UpdateState();
-
-        if (isHit)
+        if (!enemyStats.isDead)
         {
-            currentState.Impact();
-            isHit = false;
-        }
+            currentState.UpdateState();
 
-        if (scream)
-        {
-            StartCoroutine(ScreamAnimation());
-            scream = false;
+            if (isHit)
+            {
+                currentState.Impact();
+                isHit = false;
+            }
+
+            if (scream)
+            {
+                StartCoroutine(ScreamAnimation());
+                scream = false;
+            }
         }
     }
 
@@ -76,6 +79,16 @@ public class EnemyAI : MonoBehaviour
         animator.SetTrigger("Scream");
         yield return new WaitForSeconds(2.5f);
         currentState.ToAttackState();
+    }
+
+    public void EnableBlood()
+    {
+        bloodParticles.Play();
+    }
+
+    public void DisableBlood()
+    {
+        bloodParticles.Stop();
     }
 
     private void InitVariables()

@@ -17,6 +17,7 @@ MonoBehaviour:
   prefab: {fileID: 5405483963015775849, guid: bf482ce206de348cc882346a356017b3, type: 3}
   muzzleFlashParticles: {fileID: 1825952877193395310, guid: ad2ab49d0a2a17148bd51c93d977bdbc, type: 3}
   hitParticles: {fileID: 961035278023441959, guid: 0cdab7b8429cf4f43b5c64a3b05076a4, type: 3}
+  fireFX: {fileID: 8300000, guid: e0311473955f540418a6ba9baf75f839, type: 3}
   magazineSize: 12
   storedAmmo: 72
   damage: 35

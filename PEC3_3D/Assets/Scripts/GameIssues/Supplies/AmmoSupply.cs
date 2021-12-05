@@ -5,6 +5,8 @@ public class AmmoSupply : MonoBehaviour, ISupply
     private GameObject player;
     private Shooting shooting;
     private EquipmentManager manager;
+    private PlayerController playerController;
+    private AudioSource audioSource;
     private Inventory inventory;
     private Weapon currentWeapon;
 
@@ -38,6 +40,8 @@ public class AmmoSupply : MonoBehaviour, ISupply
         }
         else
         {
+            audioSource.clip = playerController.pickupClip;
+            audioSource.Play();
             shooting.AddAmmo(manager.currentlyEquipedWeapon, ammoToAdd, storageToAdd);
             Destroy(this.gameObject);
         }
@@ -45,7 +49,10 @@ public class AmmoSupply : MonoBehaviour, ISupply
 
     private void OnTriggerEnter(Collider other)
     {
-        PickupSupply();
+        if (other.gameObject.CompareTag("Player"))
+        {
+            PickupSupply();
+        }
     }
 
     private void GetReferences()
@@ -54,5 +61,7 @@ public class AmmoSupply : MonoBehaviour, ISupply
         shooting = player.GetComponent<Shooting>();
         manager = player.GetComponent<EquipmentManager>();
         inventory = player.GetComponent<Inventory>();
+        playerController = player.GetComponent<PlayerController>();
+        audioSource = player.GetComponent<AudioSource>();
     }
 }

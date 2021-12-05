@@ -5,8 +5,10 @@ using UnityEngine;
 public class Boss : MonoBehaviour
 {
     [SerializeField] private BossArea bossArea;
-    [SerializeField] private float speed;
+    //[SerializeField] private float speed;
     [SerializeField] private GameObject[] hitColliders;
+    [SerializeField] private GameObject bossCanvas;
+    [SerializeField] private GameManager gameManager;
 
     [HideInInspector] public BossStats bossStats;
     [HideInInspector] public GameObject target;
@@ -18,6 +20,8 @@ public class Boss : MonoBehaviour
     private float routineTimer = 2;
     private Animator animator;
     private float distToPlayer = 15;
+    private float walkSpeed = 2;
+    private float runSpeed = 4;
 
     // Flame thrower
     [SerializeField] private GameObject fireSphere;
@@ -26,16 +30,19 @@ public class Boss : MonoBehaviour
     private bool flameThrower;
     private List<GameObject> pool = new List<GameObject>();
     private float timer2;
+    private float flameThrowerSkill = 0.8f;
 
     // Jump Attack
     private float jumpDist;
     private bool dirSkill;
     private float jumpSpeed = 8;
+    private float jumpAttackSkill = 0.6f;
 
     // Fireball
     [SerializeField] private GameObject fireball;
     [SerializeField] private GameObject point;
     private List<GameObject> pool2 = new List<GameObject>();
+    private float fireballSkill = 1;
 
     // Phases
     [HideInInspector] public int phase = 1;
@@ -51,6 +58,7 @@ public class Boss : MonoBehaviour
     {
         if(Vector3.Distance(transform.position, target.transform.position) < distToPlayer)
         {
+            bossCanvas.SetActive(true);
             Vector3 lookDir = target.transform.position - transform.position;
             lookDir.y = 0;
             Quaternion rotation = Quaternion.LookRotation(lookDir);
@@ -62,17 +70,9 @@ public class Boss : MonoBehaviour
                 {
                     case 0:
                         // Walk
-                        transform.rotation = Quaternion.RotateTowards(transform.rotation, rotation, 2);
                         animator.SetBool("Walk", true);
                         animator.SetBool("Run", false);
-
-                        if (transform.rotation == rotation)
-                        {
-                            //Vector3.MoveTowards(transform.position, target.transform.position, speed * Time.deltaTime);
-                            transform.Translate(Vector3.forward * speed * Time.deltaTime);
-                        }
-
-                        animator.SetBool("Attack", false);
+                        MoveToPlayer(rotation, walkSpeed);
 
                         timer += 1 * Time.deltaTime;
                         if(timer > routineTimer)
@@ -85,27 +85,14 @@ public class Boss : MonoBehaviour
 
                     case 1:
                         // Run
-                        transform.rotation = Quaternion.RotateTowards(transform.rotation, rotation, 2);
                         animator.SetBool("Walk", false);
                         animator.SetBool("Run", true);
-
-                        transform.Translate(Vector3.forward * speed * 2 * Time.deltaTime);
-
-                        if (transform.rotation == rotation)
-                        {
-                            //Vector3.MoveTowards(transform.position, target.transform.position, 2 * speed * Time.deltaTime);
-                            transform.Translate(Vector3.forward * speed * 2 * Time.deltaTime);
-                        }
-
-                        animator.SetBool("Attack", false);
+                        MoveToPlayer(rotation, runSpeed);
                         break;
 
                     case 2:
                         // Flamethrow
-                        animator.SetBool("Walk", false);
-                        animator.SetBool("Run", false);
-                        animator.SetBool("Attack", true);
-                        animator.SetFloat("Skills", 0.8f);
+                        SetAnimatorForAttack(flameThrowerSkill);
                         transform.rotation = Quaternion.RotateTowards(transform.rotation, rotation, 2);
                         bossArea.GetComponent<CapsuleCollider>().enabled = false;
                         break;
@@ -115,10 +102,7 @@ public class Boss : MonoBehaviour
                         if(phase == 2)
                         {
                             jumpDist += 1 * Time.deltaTime;
-                            animator.SetBool("Walk", false);
-                            animator.SetBool("Run", false);
-                            animator.SetBool("Attack", true);
-                            animator.SetFloat("Skills", 0.6f);
+                            SetAnimatorForAttack(jumpAttackSkill);
                             collSelect = 3;
                             bossArea.GetComponent<CapsuleCollider>().enabled = false;
 
@@ -128,7 +112,6 @@ public class Boss : MonoBehaviour
                                 {
                                     transform.rotation = Quaternion.RotateTowards(transform.rotation, rotation, 2);
                                 }
-                                //Vector3.MoveTowards(transform.position, target.transform.position, jumpSpeed * Time.deltaTime);
 
                                 transform.Translate(Vector3.forward * jumpSpeed * Time.deltaTime);
                             }
@@ -144,10 +127,7 @@ public class Boss : MonoBehaviour
                         // Fireball
                         if(phase == 2)
                         {
-                            animator.SetBool("Walk", false);
-                            animator.SetBool("Run", false);
-                            animator.SetBool("Attack", true);
-                            animator.SetFloat("Skills", 1);
+                            SetAnimatorForAttack(fireballSkill);
                             bossArea.GetComponent<CapsuleCollider>().enabled = false;
                             transform.rotation = Quaternion.RotateTowards(transform.rotation, rotation, 0.5f);
                         }
@@ -160,6 +140,26 @@ public class Boss : MonoBehaviour
                 }
             }
         }
+    }
+
+    private void MoveToPlayer(Quaternion rotation, float speed)
+    {
+        transform.rotation = Quaternion.RotateTowards(transform.rotation, rotation, 2);
+
+        if (transform.rotation == rotation)
+        {
+            transform.Translate(Vector3.forward * speed * Time.deltaTime);
+        }
+
+        animator.SetBool("Attack", false);
+    }
+
+    private void SetAnimatorForAttack(float skill)
+    {
+        animator.SetBool("Walk", false);
+        animator.SetBool("Run", false);
+        animator.SetBool("Attack", true);
+        animator.SetFloat("Skills", skill);
     }
 
     public void EndAnimations()
@@ -232,7 +232,7 @@ public class Boss : MonoBehaviour
         flameThrower = false;   
     }
 
-
+    //Fireball
     public GameObject GetFireball()
     {
         for (int i = 0; i < pool2.Count; i++)
@@ -284,17 +284,18 @@ public class Boss : MonoBehaviour
 
     private void Update()
     {
-        if(bossStats.health > 0)
+        if(!bossStats.isDead)
         {
             BossAlive();
         }
         else
         {
-            if (!bossStats.isDead)
-            {
-                animator.SetTrigger("Dead");
-                bossStats.isDead = true;
-            }
+            gameManager.bossDefeted = true;
         }
+    }
+
+    public void EndDeadAnim()
+    {
+        gameManager.EndGame();
     }
 }

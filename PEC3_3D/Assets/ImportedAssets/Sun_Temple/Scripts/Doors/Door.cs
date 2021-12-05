@@ -76,6 +76,7 @@ namespace SunTemple
 		void Update()
 		{
 			if (scriptIsEnabled) {
+
 				if (Rotating) {
 					Rotate ();
 				}
@@ -91,8 +92,6 @@ namespace SunTemple
 			}
 
 		} 
-
-
 
 
 		void TryToOpen(){

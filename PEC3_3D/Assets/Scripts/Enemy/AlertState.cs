@@ -28,7 +28,7 @@ public class AlertState: IEnemyState
             RaycastHit hit;
 
             if(Physics.Raycast(new Ray(
-                new Vector3(enemyAI.transform.position.x, 1.8f, enemyAI.transform.position.z),
+                new Vector3(enemyAI.transform.position.x, enemyAI.transform.position.y + 1, enemyAI.transform.position.z),
                 enemyAI.transform.forward * 100),
                 out hit))
             {

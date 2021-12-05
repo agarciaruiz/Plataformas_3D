@@ -10,14 +10,13 @@ public class Shooting : MonoBehaviour
     [SerializeField] private Transform target;
     [SerializeField] private ParticleSystem muzzleFlash;
     [SerializeField] private ParticleSystem hitEffect;
-    [SerializeField] private GameObject bloodParticles;
 
     private Inventory inventory;
     private EquipmentManager equipmentManager;
     private PlayerHUD playerHUD;
     private Animator animator;
-    //private AudioSource gunAudio;
-    //[SerializeField] AudioClip reloadClip;
+    private AudioSource gunAudio;
+    [SerializeField] AudioClip reloadClip;
 
     private PlayerInput playerInput;
     private InputAction reloadAction;
@@ -60,8 +59,8 @@ public class Shooting : MonoBehaviour
         if (reloadAction.triggered)
         {
             Reload(equipmentManager.currentlyEquipedWeapon);
-            /*gunAudio.clip = reloadClip;
-            gunAudio.Play();*/
+            gunAudio.clip = reloadClip;
+            gunAudio.Play();
         }
     }
 
@@ -85,10 +84,13 @@ public class Shooting : MonoBehaviour
                 EnemyAI enemyAI = hit.collider.gameObject.GetComponentInParent<EnemyAI>();
                 enemyAI.isHit = true;
                 StartCoroutine(EnemyHitAnim(hit.collider.gameObject.GetComponentInParent<Animator>()));
-                //EmitParticles(bloodParticles, hit);
-                GameObject particleInstance = (GameObject)Instantiate(bloodParticles, hit.point, Quaternion.identity);
-                Destroy(particleInstance, 0.5f);
                 DealDamage(enemyStats, currentWeapon.damage);
+            }
+
+            if(hit.transform.CompareTag("Boss"))
+            {
+                BossStats bossStats = hit.transform.gameObject.GetComponent<BossStats>();
+                DealDamage(bossStats, currentWeapon.damage);
             }
 
             if (hit.collider.gameObject.tag != "Enemy")
@@ -104,7 +106,7 @@ public class Shooting : MonoBehaviour
         Weapon currentWeapon = inventory.GetItem(equipmentManager.currentlyEquipedWeapon);
 
         CheckCanShoot(equipmentManager.currentlyEquipedWeapon);
-        //InitAudio(currentWeapon);
+        InitAudio(currentWeapon);
 
         if (canShoot && canReload)
         {
@@ -114,8 +116,8 @@ public class Shooting : MonoBehaviour
                 RaycastShoot(currentWeapon);
                 UseAmmo((int)currentWeapon.weaponStyle, 1, 0);
                 StartCoroutine(ShootAnim());
-                /*gunAudio.clip = currentWeapon.fireFX;
-                gunAudio.Play();*/
+                gunAudio.clip = currentWeapon.fireFX;
+                gunAudio.Play();
             }
         }
     }
@@ -298,10 +300,10 @@ public class Shooting : MonoBehaviour
         }
     }
 
-    /*private void InitAudio(Weapon weapon)
+    private void InitAudio(Weapon weapon)
     {
-        //gunAudio.clip = weapon.fireFX;
-    }*/
+        gunAudio.clip = weapon.fireFX;
+    }
 
     private void GetReferences()
     {
@@ -310,7 +312,7 @@ public class Shooting : MonoBehaviour
         playerInput = GetComponent<PlayerInput>();
         playerHUD = GetComponent<PlayerHUD>();
         animator = GetComponent<Animator>();
-        //gunAudio = GetComponent<AudioSource>();
+        gunAudio = GetComponent<AudioSource>();
     }
 
     private void InitVariables()

@@ -8,8 +8,7 @@ public class Weapon : Item
     public GameObject prefab;
     public GameObject muzzleFlashParticles;
     public ParticleSystem hitParticles;
-    //public Transform barrel;
-    //public AudioClip fireFX;
+    public AudioClip fireFX;
     public int magazineSize;
     public int storedAmmo;
     public int damage;
